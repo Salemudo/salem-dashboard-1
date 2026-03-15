@@ -736,7 +736,7 @@ function getReplitUrl() {
 }
 
 async function testBackend() {
-  const url = getReplitUrl();
+  const url = 'https://salem-s-intel.onrender.com';
   const status = document.getElementById('backend-status');
   if (!url || url === 'YOUR_REPLIT_URL_HERE') {
     status.textContent = '⚠ Paste your Replit URL first';
