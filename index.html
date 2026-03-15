@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SALEM // Intel v2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+:root {
+  --bg: #06070d;
+  --bg2: #0b0e1a;
+  --bg3: #101525;
+  --neon: #00f5c4;
+  --neon2: #ff3de8;
+  --neon3: #ffd600;
+  --neon4: #3d9eff;
+  --neonX: #e8c84a;
+  --neonTT: #ff4f6d;
+  --text: #d4e0f5;
+  --dim: #3d4f6e;
+  --border: rgba(0,245,196,0.12);
+  --borderX: rgba(232,200,74,0.2);
+  --borderTT: rgba(255,79,109,0.2);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden;}
+
+.bg-fx{
+  position:fixed;inset:0;z-index:0;pointer-events:none !important;
+  background:
+    radial-gradient(ellipse 60% 40% at 10% 20%,rgba(0,245,196,.04) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 30% at 90% 80%,rgba(255,61,232,.04) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 30% at 50% 50%,rgba(232,200,74,.02) 0%,transparent 70%),
+    repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,245,196,.015) 39px,rgba(0,245,196,.015) 40px),
+    repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(0,245,196,.015) 39px,rgba(0,245,196,.015) 40px);
+}
+
+.wrap{position:relative;z-index:2;max-width:1280px;margin:0 auto;padding:0 20px 80px;}
+
+/* ── NAV TABS ── */
+.main-tabs{
+  display:flex;gap:0;border-bottom:1px solid var(--border);
+  margin-bottom:28px;overflow-x:auto;
+  position:relative;z-index:10;
+}
+.main-tab{
+  background:transparent;border:none;border-bottom:2px solid transparent;
+  color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:11px;
+  letter-spacing:.2em;text-transform:uppercase;padding:18px 24px;cursor:pointer;
+  transition:all .2s;white-space:nowrap;position:relative;z-index:10;
+  pointer-events:all;
+}
+.main-tab:hover{color:var(--text);}
+.main-tab.active{color:var(--neon);border-bottom-color:var(--neon);}
+.main-tab.tab-x.active{color:var(--neonX);border-bottom-color:var(--neonX);}
+.main-tab.tab-tt.active{color:var(--neonTT);border-bottom-color:var(--neonTT);}
+
+/* ── HEADER ── */
+.header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:24px 0 20px;border-bottom:1px solid var(--border);margin-bottom:0;
+  flex-wrap:wrap;gap:14px;
+}
+.brand{display:flex;align-items:center;gap:14px;}
+.cat{font-size:36px;filter:drop-shadow(0 0 16px var(--neon));animation:bob 4s ease-in-out infinite;}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-6px) rotate(2deg)}}
+.brand-name{font-weight:800;font-size:22px;color:var(--neon);text-transform:uppercase;letter-spacing:.12em;text-shadow:0 0 24px rgba(0,245,196,.5);}
+.brand-sub{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--neon2);letter-spacing:.25em;text-transform:uppercase;margin-top:2px;}
+.header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.live-badge{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--neon);letter-spacing:.2em;text-transform:uppercase;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--neon);animation:blink 1.4s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── BUTTONS ── */
+.btn{
+  background:transparent;border:1px solid var(--border);border-radius:3px;
+  color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:.15em;padding:8px 16px;cursor:pointer;transition:all .2s;text-transform:uppercase;
+}
+.btn:hover{border-color:var(--neon);color:var(--neon);}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.btn.x-btn:hover{border-color:var(--neonX);color:var(--neonX);}
+.btn.tt-btn:hover{border-color:var(--neonTT);color:var(--neonTT);}
+.btn.primary{border-color:var(--neon);color:var(--neon);}
+
+/* ── PANELS ── */
+.page{display:none;position:relative;z-index:1;}
+.page.active{display:block;}
+
+/* ── TREND HERO ── */
+.trend-hero{
+  background:var(--bg2);border-radius:6px;padding:28px 28px 24px;
+  margin-bottom:20px;position:relative;overflow:hidden;
+  border:1px solid var(--borderX);
+}
+.trend-hero.tt-hero{border-color:var(--borderTT);}
+.trend-hero::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--neonX),transparent);
+}
+.trend-hero.tt-hero::before{background:linear-gradient(90deg,var(--neonTT),transparent);}
+
+.trend-hero-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:16px;flex-wrap:wrap;}
+.trend-hero-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;}
+.trend-hero-title.x-title{color:var(--neonX);}
+.trend-hero-title.tt-title{color:var(--neonTT);}
+.trend-hero-sub{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);margin-top:3px;letter-spacing:.1em;}
+
+.trend-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;}
+
+.trend-chip{
+  background:var(--bg3);border:1px solid rgba(232,200,74,.1);
+  border-radius:4px;padding:14px 16px;cursor:pointer;
+  transition:all .15s;position:relative;
+}
+.trend-chip:hover{border-color:var(--neonX);transform:translateY(-2px);box-shadow:0 4px 20px rgba(232,200,74,.08);}
+.trend-chip.tt-chip{border-color:rgba(255,79,109,.1);}
+.trend-chip.tt-chip:hover{border-color:var(--neonTT);box-shadow:0 4px 20px rgba(255,79,109,.08);}
+
+.chip-rank{
+  font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--dim);
+  letter-spacing:.1em;margin-bottom:6px;
+}
+.chip-topic{font-size:14px;font-weight:700;line-height:1.3;margin-bottom:6px;}
+.chip-context{font-size:12px;color:rgba(212,224,245,.55);line-height:1.5;margin-bottom:10px;}
+.chip-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
+.chip-tag{
+  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;
+  padding:2px 7px;border-radius:2px;text-transform:uppercase;
+}
+.chip-tag.hot{background:rgba(255,214,0,.1);color:var(--neon3);border:1px solid rgba(255,214,0,.2);}
+.chip-tag.web3{background:rgba(255,61,232,.1);color:var(--neon2);border:1px solid rgba(255,61,232,.2);}
+.chip-tag.culture{background:rgba(61,158,255,.1);color:var(--neon4);border:1px solid rgba(61,158,255,.2);}
+.chip-tag.finance{background:rgba(0,245,196,.1);color:var(--neon);border:1px solid rgba(0,245,196,.2);}
+.chip-actions{display:flex;gap:6px;}
+.chip-btn{
+  background:transparent;border:1px solid var(--border);border-radius:2px;
+  color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:9px;
+  letter-spacing:.1em;padding:4px 10px;cursor:pointer;transition:all .15s;text-transform:uppercase;
+}
+.chip-btn:hover{border-color:var(--neon2);color:var(--neon2);}
+
+/* ── LOADING STATE ── */
+.scan-state{
+  text-align:center;padding:40px 20px;
+  font-family:'JetBrains Mono',monospace;
+}
+.scan-title{font-size:13px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:16px;}
+.scan-title.x-color{color:var(--neonX);}
+.scan-title.tt-color{color:var(--neonTT);}
+.scan-steps{display:flex;flex-direction:column;gap:8px;max-width:400px;margin:0 auto 20px;}
+.scan-step{
+  display:flex;align-items:center;gap:10px;
+  font-size:11px;color:var(--dim);letter-spacing:.1em;text-align:left;
+}
+.scan-step.done{color:var(--neon);}
+.scan-step.active{color:var(--text);}
+.scan-step .step-icon{width:16px;text-align:center;flex-shrink:0;}
+.scan-progress{
+  width:100%;max-width:400px;height:2px;background:var(--bg3);
+  border-radius:1px;margin:0 auto;overflow:hidden;
+}
+.scan-progress-bar{
+  height:100%;background:var(--neonX);border-radius:1px;
+  transition:width .4s ease;width:0%;
+}
+.scan-progress-bar.tt-bar{background:var(--neonTT);}
+
+/* ── BRIDGE PANEL ── */
+.bridge-panel{
+  background:linear-gradient(135deg,rgba(0,245,196,.04),rgba(255,61,232,.04));
+  border:1px solid rgba(0,245,196,.2);border-radius:6px;padding:22px 24px;
+  margin-bottom:20px;display:none;position:relative;overflow:hidden;
+}
+.bridge-panel.visible{display:block;}
+.bridge-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--neon),var(--neon2));}
+.bridge-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.bridge-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--neon2);letter-spacing:.25em;text-transform:uppercase;}
+.bridge-close{background:none;border:none;color:var(--dim);cursor:pointer;font-size:14px;padding:2px 6px;}
+.bridge-close:hover{color:var(--neon2);}
+.bridge-topic{font-size:13px;color:var(--neon3);font-weight:700;margin-bottom:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.08em;}
+.bridge-text{font-size:14px;line-height:1.75;color:var(--text);}
+.bridge-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+
+/* ── NEWS SECTION ── */
+.section-hdr{display:flex;align-items:center;gap:12px;margin-bottom:14px;margin-top:24px;}
+.section-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--neon);white-space:nowrap;}
+.section-line{flex:1;height:1px;background:var(--border);}
+.section-ct{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);background:var(--bg3);border:1px solid var(--border);border-radius:2px;padding:2px 8px;}
+
+.news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;}
+
+.card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:18px;
+  position:relative;overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s;
+  cursor:pointer;animation:fadeIn .4s ease both;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.card:hover{transform:translateY(-3px);}
+.card.web3:hover{border-color:rgba(255,61,232,.4);box-shadow:0 6px 24px rgba(255,61,232,.07);}
+.card.web2:hover{border-color:rgba(61,158,255,.4);box-shadow:0 6px 24px rgba(61,158,255,.07);}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.card.web3::before{background:linear-gradient(90deg,var(--neon2),transparent);}
+.card.web2::before{background:linear-gradient(90deg,var(--neon4),transparent);}
+
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:8px;}
+.tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;padding:3px 7px;border-radius:2px;white-space:nowrap;flex-shrink:0;}
+.tag.web3{background:rgba(255,61,232,.1);color:var(--neon2);border:1px solid rgba(255,61,232,.2);}
+.tag.web2{background:rgba(61,158,255,.1);color:var(--neon4);border:1px solid rgba(61,158,255,.2);}
+.tag.defi{background:rgba(255,214,0,.1);color:var(--neon3);border:1px solid rgba(255,214,0,.2);}
+.tag.nft{background:rgba(0,245,196,.08);color:var(--neon);border:1px solid rgba(0,245,196,.2);}
+.card-source{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);}
+.card-title{font-size:14px;font-weight:700;line-height:1.4;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.card-summary{font-size:12px;line-height:1.6;color:rgba(212,224,245,.55);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:12px;}
+.card-bottom{display:flex;align-items:center;justify-content:space-between;}
+.card-time{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);}
+.card-actions{display:flex;gap:5px;}
+.card-btn{background:transparent;border:1px solid var(--border);border-radius:2px;color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;padding:3px 8px;cursor:pointer;transition:all .15s;text-transform:uppercase;}
+.card-btn:hover{border-color:var(--neon);color:var(--neon);}
+.card-btn.bridge-btn:hover{border-color:var(--neon2);color:var(--neon2);}
+
+/* skeletons */
+.skeleton{background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:18px;}
+.skel{height:11px;background:var(--bg3);border-radius:2px;margin-bottom:9px;animation:shimmer 1.5s infinite;}
+.skel.s{width:35%}.skel.m{width:60%}.skel.l{width:88%}
+@keyframes shimmer{0%,100%{opacity:.4}50%{opacity:.8}}
+
+/* stats */
+.stats-bar{display:flex;gap:18px;padding:12px 0;flex-wrap:wrap;}
+.stat{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:.1em;}
+.stat span{color:var(--text);font-weight:700;margin-left:4px;}
+
+/* filter bar */
+.filter-bar{display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+.filter-btn{background:var(--bg3);border:1px solid var(--border);border-radius:3px;color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;padding:6px 12px;cursor:pointer;transition:all .15s;text-transform:uppercase;}
+.filter-btn:hover{color:var(--text);}
+.filter-btn.active{color:var(--neon);border-color:var(--neon);background:rgba(0,245,196,.05);}
+.filter-btn.fw2.active{color:var(--neon4);border-color:var(--neon4);}
+.filter-btn.fw3.active{color:var(--neon2);border-color:var(--neon2);}
+.search-wrap{margin-left:auto;}
+.search-input{background:var(--bg3);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;padding:7px 14px;outline:none;transition:border-color .2s;width:200px;}
+.search-input:focus{border-color:var(--neon);}
+.search-input::placeholder{color:var(--dim);}
+
+/* empty */
+.empty{text-align:center;padding:50px 20px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim);letter-spacing:.1em;grid-column:1/-1;}
+
+/* modal */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(6,7,13,.92);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.visible{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:6px;width:100%;max-width:600px;max-height:85vh;overflow-y:auto;position:relative;animation:slideUp .25s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--neon),var(--neon2));}
+.modal-body{padding:26px;}
+.modal-tag{margin-bottom:12px;}
+.modal-title{font-size:18px;font-weight:700;line-height:1.4;margin-bottom:12px;}
+.modal-meta{display:flex;gap:14px;margin-bottom:14px;}
+.modal-meta-item{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);}
+.modal-summary{font-size:13px;line-height:1.7;color:rgba(212,224,245,.7);margin-bottom:18px;}
+.modal-divider{height:1px;background:var(--border);margin-bottom:16px;}
+.modal-bridge-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--neon2);letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px;}
+.modal-bridge-body{font-size:13px;line-height:1.75;}
+.modal-actions{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;}
+.modal-btn{background:transparent;border:1px solid var(--border);border-radius:3px;color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;padding:8px 16px;cursor:pointer;transition:all .15s;text-transform:uppercase;}
+.modal-btn:hover{border-color:var(--neon);color:var(--neon);}
+.modal-btn.primary{border-color:var(--neon);color:var(--neon);}
+.modal-btn.ml{margin-left:auto;}
+.modal-btn.ml:hover{border-color:var(--neon2);color:var(--neon2);}
+.ai-loading{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--neon2);letter-spacing:.15em;}
+.dots span{display:inline-block;width:5px;height:5px;background:currentColor;border-radius:50%;margin:0 2px;animation:pulse 1.2s infinite;}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes pulse{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+
+/* intro card */
+.intro-card{background:var(--bg2);border:1px solid var(--borderX);border-radius:6px;padding:28px;text-align:center;margin-bottom:4px;}
+.intro-card.tt-card{border-color:var(--borderTT);}
+.intro-icon{font-size:40px;margin-bottom:12px;}
+.intro-title{font-size:16px;font-weight:700;margin-bottom:8px;}
+.intro-desc{font-size:13px;color:rgba(212,224,245,.6);line-height:1.6;max-width:460px;margin:0 auto 20px;}
+.intro-bullets{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;}
+.bullet{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;padding:6px 12px;border-radius:3px;text-transform:uppercase;}
+.bullet.x{background:rgba(232,200,74,.08);color:var(--neonX);border:1px solid rgba(232,200,74,.2);}
+.bullet.tt{background:rgba(255,79,109,.08);color:var(--neonTT);border:1px solid rgba(255,79,109,.2);}
+.scan-launch-btn{
+  background:transparent;border:1px solid;border-radius:3px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.15em;
+  padding:12px 28px;cursor:pointer;transition:all .2s;text-transform:uppercase;
+}
+.scan-launch-btn.x-launch{border-color:var(--neonX);color:var(--neonX);}
+.scan-launch-btn.x-launch:hover{background:rgba(232,200,74,.08);}
+.scan-launch-btn.tt-launch{border-color:var(--neonTT);color:var(--neonTT);}
+.scan-launch-btn.tt-launch:hover{background:rgba(255,79,109,.08);}
+</style>
+</head>
+<body>
+<div class="bg-fx"></div>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand">
+      <div class="cat">🐱</div>
+      <div>
+        <div class="brand-name">Salem // Intel v2</div>
+        <div class="brand-sub">News · X Trends · TikTok Trends</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+      <button class="btn" id="refresh-btn" onclick="refreshCurrent()">↻ REFRESH</button>
+    </div>
+  </div>
+
+  <!-- NAV TABS -->
+  <div class="main-tabs" id="main-tabs">
+    <button class="main-tab active" id="tab-news">📰 NEWS FEED</button>
+    <button class="main-tab tab-x" id="tab-x">𝕏 TWITTER TRENDS</button>
+    <button class="main-tab tab-tt" id="tab-tt">🎵 TIKTOK TRENDS</button>
+    <button class="main-tab" id="tab-gtrends">📈 GOOGLE TRENDS</button>
+  </div>
+
+  <!-- BRIDGE PANEL (shared) -->
+  <div class="bridge-panel" id="bridge-panel">
+    <div class="bridge-header">
+      <div class="bridge-label">// AI BRIDGE ANALYSIS</div>
+      <button class="bridge-close" onclick="closeBridge()">✕</button>
+    </div>
+    <div class="bridge-topic" id="bridge-topic"></div>
+    <div id="bridge-content"></div>
+    <div class="bridge-actions" id="bridge-actions" style="display:none">
+      <button class="btn primary" onclick="openScriptGen()">⚡ GENERATE SCRIPT</button>
+      <button class="btn" onclick="closeBridge()">DISMISS</button>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: NEWS ══ -->
+  <div class="page active" id="page-news">
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="setNewsFilter('all',this)">ALL</button>
+      <button class="filter-btn fw3" onclick="setNewsFilter('web3',this)">WEB3</button>
+      <button class="filter-btn fw2" onclick="setNewsFilter('web2',this)">WEB2</button>
+      <button class="filter-btn" onclick="setNewsFilter('defi',this)">DEFI</button>
+      <button class="filter-btn" onclick="setNewsFilter('nft',this)">NFT</button>
+      <div class="search-wrap"><input class="search-input" id="news-search" placeholder="Search..." oninput="renderNews()"></div>
+    </div>
+    <div class="stats-bar" id="news-stats"></div>
+    <div class="news-grid" id="news-grid"></div>
+  </div>
+
+  <!-- ══ PAGE: X TRENDS ══ -->
+  <div class="page" id="page-x">
+    <div id="x-intro">
+      <div class="intro-card">
+        <div class="intro-icon">𝕏</div>
+        <div class="intro-title">X / Twitter Live Trend Scanner</div>
+        <div class="intro-desc">
+          Pulls <strong style="color:var(--neonX)">live hourly trends from X</strong> via your Replit backend scraping Trends24. 
+          One-time setup required.
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--borderX);border-radius:5px;padding:18px 20px;text-align:left;margin-bottom:18px;max-width:500px;margin-left:auto;margin-right:auto;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--neonX);letter-spacing:.2em;margin-bottom:12px;">// SETUP — ONE TIME ONLY</div>
+          <div style="font-size:13px;line-height:2;color:var(--text);">
+            <span style="color:var(--neon3)">1.</span> Go to <a href="https://replit.com" target="_blank" style="color:var(--neon)">replit.com</a> → Create a new Repl → choose <strong>Python</strong><br>
+            <span style="color:var(--neon3)">2.</span> Upload <strong style="color:var(--neon)">main.py</strong> and <strong style="color:var(--neon)">requirements.txt</strong> (download below)<br>
+            <span style="color:var(--neon3)">3.</span> Click <strong>Run</strong> — Replit installs deps and starts the server<br>
+            <span style="color:var(--neon3)">4.</span> Copy your Replit URL (looks like <code style="color:var(--neon2)">https://yourproject.yourusername.repl.co</code>)<br>
+            <span style="color:var(--neon3)">5.</span> Paste it in the box below and click Save
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:16px;flex-wrap:wrap;">
+          <input id="replit-url-input" placeholder="https://yourproject.yourusername.repl.co"
+            style="background:var(--bg3);border:1px solid var(--borderX);border-radius:3px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;padding:9px 14px;outline:none;width:320px;"
+            oninput="saveReplitUrl()" />
+          <button class="btn x-btn" onclick="testBackend()">TEST CONNECTION</button>
+        </div>
+        <div id="backend-status" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);margin-bottom:14px;min-height:18px;"></div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:18px;">
+          <select id="region-select" style="background:var(--bg3);border:1px solid var(--borderX);border-radius:3px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;padding:8px 14px;outline:none;">
+            <option value="worldwide">🌍 Worldwide</option>
+            <option value="united-states">🇺🇸 United States</option>
+            <option value="united-kingdom">🇬🇧 United Kingdom</option>
+            <option value="nigeria">🇳🇬 Nigeria</option>
+            <option value="canada">🇨🇦 Canada</option>
+            <option value="australia">🇦🇺 Australia</option>
+          </select>
+        </div>
+        <button class="scan-launch-btn x-launch" onclick="runXScan()">⚡ SCAN LIVE X TRENDS</button>
+      </div>
+    </div>
+    <div id="x-scan-state" style="display:none">
+      <div class="trend-hero">
+        <div class="trend-hero-top">
+          <div>
+            <div class="trend-hero-title x-title">𝕏 SCANNING TWITTER TRENDS</div>
+            <div class="trend-hero-sub">AI is searching X for what's trending right now</div>
+          </div>
+        </div>
+        <div class="scan-state">
+          <div class="scan-steps" id="x-scan-steps"></div>
+          <div class="scan-progress"><div class="scan-progress-bar" id="x-progress-bar"></div></div>
+        </div>
+      </div>
+    </div>
+    <div id="x-results" style="display:none">
+      <div class="trend-hero">
+        <div class="trend-hero-top">
+          <div>
+            <div class="trend-hero-title x-title">𝕏 TRENDING NOW</div>
+            <div class="trend-hero-sub" id="x-scan-time"></div>
+          </div>
+          <button class="btn x-btn" onclick="runXScan()">↻ RESCAN</button>
+        </div>
+        <div class="trend-grid" id="x-trend-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: TIKTOK ══ -->
+  <div class="page" id="page-tt">
+    <div id="tt-intro">
+      <div class="intro-card tt-card">
+        <div class="intro-icon">🎵</div>
+        <div class="intro-title">TikTok Trend Scanner</div>
+        <div class="intro-desc">AI scans TikTok's trending topics, sounds, and formats — finds what's going viral in mainstream culture and maps it to web3 content opportunities.</div>
+        <div class="intro-bullets">
+          <div class="bullet tt">🎬 Viral formats</div>
+          <div class="bullet tt">🎵 Trending sounds</div>
+          <div class="bullet tt">💥 Culture moments</div>
+          <div class="bullet tt">🌉 Web3 bridges</div>
+        </div>
+        <button class="scan-launch-btn tt-launch" onclick="runTTScan()">⚡ SCAN TIKTOK TRENDS NOW</button>
+      </div>
+    </div>
+    <div id="tt-scan-state" style="display:none">
+      <div class="trend-hero tt-hero">
+        <div class="trend-hero-top">
+          <div>
+            <div class="trend-hero-title tt-title">🎵 SCANNING TIKTOK TRENDS</div>
+            <div class="trend-hero-sub">AI is searching for what's going viral right now</div>
+          </div>
+        </div>
+        <div class="scan-state">
+          <div class="scan-steps" id="tt-scan-steps"></div>
+          <div class="scan-progress"><div class="scan-progress-bar tt-bar" id="tt-progress-bar"></div></div>
+        </div>
+      </div>
+    </div>
+    <div id="tt-results" style="display:none">
+      <div class="trend-hero tt-hero">
+        <div class="trend-hero-top">
+          <div>
+            <div class="trend-hero-title tt-title">🎵 TIKTOK TRENDING NOW</div>
+            <div class="trend-hero-sub" id="tt-scan-time"></div>
+          </div>
+          <button class="btn tt-btn" onclick="runTTScan()">↻ RESCAN</button>
+        </div>
+        <div class="trend-grid" id="tt-trend-grid"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+  <!-- ══ PAGE: GOOGLE TRENDS ══ -->
+  <div class="page" id="page-gtrends">
+    <div id="gt-intro">
+      <div class="intro-card" style="border-color:rgba(61,158,255,.25)">
+        <div class="intro-icon">📈</div>
+        <div class="intro-title" style="color:var(--neon4)">Google Trends — Real Time</div>
+        <div class="intro-desc">Pulls <strong style="color:var(--neon4)">live trending searches</strong> from Google's public RSS feed — no CORS issues, no API key, updates every few hours. AI maps each trend to Salem's content angle.</div>
+        <div class="intro-bullets">
+          <div class="bullet x" style="background:rgba(61,158,255,.08);color:var(--neon4);border-color:rgba(61,158,255,.2)">✅ No CORS issues</div>
+          <div class="bullet x" style="background:rgba(61,158,255,.08);color:var(--neon4);border-color:rgba(61,158,255,.2)">🔄 Updated hourly</div>
+          <div class="bullet x" style="background:rgba(61,158,255,.08);color:var(--neon4);border-color:rgba(61,158,255,.2)">🌍 Real searches</div>
+          <div class="bullet x" style="background:rgba(61,158,255,.08);color:var(--neon4);border-color:rgba(61,158,255,.2)">⚡ Salem angles</div>
+        </div>
+        <button class="scan-launch-btn" style="border-color:var(--neon4);color:var(--neon4)" onclick="runGTScan()">⚡ SCAN GOOGLE TRENDS NOW</button>
+      </div>
+    </div>
+    <div id="gt-scan-state" style="display:none">
+      <div class="trend-hero" style="border-color:rgba(61,158,255,.2)">
+        <div class="trend-hero-top">
+          <div>
+            <div class="trend-hero-title" style="color:var(--neon4)">📈 FETCHING GOOGLE TRENDS</div>
+            <div class="trend-hero-sub">Pulling live trending searches...</div>
+          </div>
+        </div>
+        <div class="scan-state">
+          <div class="scan-steps" id="gt-scan-steps"></div>
+          <div class="scan-progress"><div class="scan-progress-bar" id="gt-progress-bar" style="background:var(--neon4)"></div></div>
+        </div>
+      </div>
+    </div>
+    <div id="gt-results" style="display:none">
+      <div class="trend-hero" style="border-color:rgba(61,158,255,.2)">
+        <div class="trend-hero-top">
+          <div>
+            <div class="trend-hero-title" style="color:var(--neon4)">📈 GOOGLE TRENDS — LIVE</div>
+            <div class="trend-hero-sub" id="gt-scan-time"></div>
+          </div>
+          <button class="btn" style="border-color:rgba(61,158,255,.3);color:var(--neon4)" onclick="runGTScan()">↻ RESCAN</button>
+        </div>
+        <div class="trend-grid" id="gt-trend-grid"></div>
+      </div>
+    </div>
+  </div>
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal"><div class="modal-body" id="modal-body"></div></div>
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────
+let allArticles = [], newsFilter = 'all', activeStory = null, activeTrend = null, currentTab = 'news';
+
+const RSS_SOURCES = [
+  {name:'CoinDesk',url:'https://www.coindesk.com/arc/outboundfeeds/rss/',type:'web3',tag:'web3'},
+  {name:'CoinTelegraph',url:'https://cointelegraph.com/rss',type:'web3',tag:'web3'},
+  {name:'Decrypt',url:'https://decrypt.co/feed',type:'web3',tag:'web3'},
+  {name:'The Block',url:'https://www.theblock.co/rss.xml',type:'web3',tag:'web3'},
+  {name:'TechCrunch',url:'https://techcrunch.com/feed/',type:'web2',tag:'web2'},
+  {name:'The Verge',url:'https://www.theverge.com/rss/index.xml',type:'web2',tag:'web2'},
+  {name:'Wired',url:'https://www.wired.com/feed/rss',type:'web2',tag:'web2'},
+  {name:'Ars Technica',url:'https://feeds.arstechnica.com/arstechnica/index',type:'web2',tag:'web2'},
+];
+const PROXY = 'https://api.rss2json.com/v1/api.json?rss_url=';
+
+// Wire up tabs and boot
+document.addEventListener('DOMContentLoaded', () => {
+  // Tab listeners
+  document.getElementById('tab-news')?.addEventListener('click', () => switchTab('news'));
+  document.getElementById('tab-x')?.addEventListener('click', () => switchTab('x'));
+  document.getElementById('tab-tt')?.addEventListener('click', () => switchTab('tt'));
+  document.getElementById('tab-gtrends')?.addEventListener('click', () => switchTab('gtrends'));
+  // Set initial state
+  switchTab('news');
+  // Load news
+  loadNews();
+
+  // Load saved Replit URL
+  const saved = localStorage.getItem('salem_replit_url');
+  if (saved) {
+    window._REPLIT_URL = saved;
+    const input = document.getElementById('replit-url-input');
+    if (input) input.value = saved;
+  }
+});
+
+// ── TAB SWITCHING ─────────────────────────────────────
+function switchTab(tab) {
+  currentTab = tab;
+  // Update tab styles
+  ['news','x','tt','gtrends'].forEach(t => {
+    const btn = document.getElementById('tab-' + t);
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+  // Show/hide pages
+  ['news','x','tt','gtrends'].forEach(t => {
+    const page = document.getElementById('page-' + t);
+    if (page) page.style.display = t === tab ? 'block' : 'none';
+  });
+}
+
+
+function refreshCurrent() {
+  if (currentTab === 'news') loadNews();
+  else if (currentTab === 'x') runXScan();
+  else if (currentTab === 'tt') runTTScan();
+  else if (currentTab === 'gtrends') runGTScan();
+}
+
+// ── NEWS ──────────────────────────────────────────────
+async function loadNews() {
+  const btn = document.getElementById('refresh-btn');
+  btn.disabled = true;
+  showNewsSkeletons();
+  allArticles = [];
+  await Promise.allSettled(RSS_SOURCES.map(fetchSource));
+  allArticles.sort((a,b) => new Date(b.pubDate)-new Date(a.pubDate));
+  renderNews();
+  updateNewsStats();
+  btn.disabled = false;
+}
+
+async function fetchSource(src) {
+  try {
+    const r = await fetch(`${PROXY}${encodeURIComponent(src.url)}&count=8`);
+    const d = await r.json();
+    if (d.status !== 'ok' || !d.items) return;
+    d.items.forEach(item => allArticles.push({
+      id: Math.random().toString(36).slice(2),
+      title: item.title||'',
+      summary: strip(item.description||item.content||'').slice(0,200),
+      url: item.link||'', source: src.name, type: src.type,
+      tag: detectTag(item.title+' '+(item.description||''), src.tag),
+      pubDate: item.pubDate||new Date().toISOString(),
+    }));
+  } catch(e){}
+}
+
+function detectTag(t, def) {
+  t = t.toLowerCase();
+  if(t.includes('nft')||t.includes('opensea')||t.includes('ordinal')) return 'nft';
+  if(t.includes('defi')||t.includes('uniswap')||t.includes('yield')) return 'defi';
+  if(t.includes('bitcoin')||t.includes('ethereum')||t.includes('solana')||t.includes('crypto')) return 'web3';
+  return def;
+}
+
+function showNewsSkeletons() {
+  document.getElementById('news-grid').innerHTML = Array(8).fill(0).map(()=>`
+    <div class="skeleton"><div class="skel s"></div><div class="skel l"></div><div class="skel m"></div><div class="skel s"></div></div>`).join('');
+}
+
+function renderNews() {
+  const q = document.getElementById('news-search').value.toLowerCase();
+  const filtered = allArticles.filter(a => {
+    const mf = newsFilter==='all'||a.tag===newsFilter||(newsFilter==='web3'&&['web3','defi','nft'].includes(a.tag))||(newsFilter==='web2'&&a.type==='web2');
+    const ms = !q||a.title.toLowerCase().includes(q)||a.summary.toLowerCase().includes(q);
+    return mf && ms;
+  });
+  const grid = document.getElementById('news-grid');
+  if (!filtered.length) { grid.innerHTML=`<div class="empty">NO STORIES FOUND</div>`; return; }
+  grid.innerHTML = filtered.slice(0,40).map((a,i)=>`
+    <div class="card ${a.type}" style="animation-delay:${Math.min(i*.04,.6)}s" onclick="openNewsModal('${a.id}')">
+      <div class="card-top"><span class="tag ${a.tag}">${a.tag.toUpperCase()}</span><span class="card-source">${esc(a.source)}</span></div>
+      <div class="card-title">${esc(a.title)}</div>
+      <div class="card-summary">${esc(a.summary)}</div>
+      <div class="card-bottom">
+        <span class="card-time">${ago(a.pubDate)}</span>
+        <div class="card-actions">
+          <button class="card-btn bridge-btn" onclick="event.stopPropagation();quickBridgeNews('${a.id}')">🔗 BRIDGE</button>
+          <button class="card-btn" onclick="event.stopPropagation();window.open('${a.url}','_blank')">↗</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function updateNewsStats() {
+  const w3 = allArticles.filter(a=>['web3','defi','nft'].includes(a.tag)).length;
+  const w2 = allArticles.filter(a=>a.type==='web2').length;
+  document.getElementById('news-stats').innerHTML=`
+    <div class="stat">TOTAL<span>${allArticles.length}</span></div>
+    <div class="stat">WEB3<span>${w3}</span></div>
+    <div class="stat">WEB2<span>${w2}</span></div>
+    <div class="stat">SOURCES<span>${RSS_SOURCES.length}</span></div>
+    <div class="stat">UPDATED<span>${new Date().toLocaleTimeString()}</span></div>`;
+}
+
+function setNewsFilter(f,el) {
+  newsFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active'); renderNews();
+}
+
+// ── CONFIG — set your Replit URL here after deploying ──
+const REPLIT_URL = 'YOUR_REPLIT_URL_HERE'; // e.g. https://salem-intel.yourusername.repl.co
+
+// ── X TREND SCAN (via Replit backend) ─────────────────
+async function runXScan() {
+  document.getElementById('x-intro').style.display='none';
+  document.getElementById('x-results').style.display='none';
+  document.getElementById('x-scan-state').style.display='block';
+
+  const steps = [
+    'Connecting to Salem Intel backend...',
+    'Scraping Trends24 live data...',
+    'Parsing trending topics...',
+    'Running AI bridge analysis...',
+    'Building Salem content angles...'
+  ];
+  animateScanSteps('x-scan-steps', 'x-progress-bar', steps);
+
+  try {
+    if (!getReplitUrl() || getReplitUrl() === 'YOUR_REPLIT_URL_HERE') {
+      throw new Error('Backend URL not set — paste your Replit URL into the box above');
+    }
+
+    const regionEl = document.getElementById('region-select');
+    const region = regionEl ? regionEl.value : 'worldwide';
+
+    const resp = await fetch(`${getReplitUrl()}/trends/x?region=${region}`, {
+      signal: AbortSignal.timeout(15000)
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(()=>({error:'Backend error'}));
+      throw new Error(err.error || `Backend returned ${resp.status}`);
+    }
+    const data = await resp.json();
+    if (!data.trends?.length) throw new Error('No trends returned from backend');
+
+    // Feed real topics to Claude for Salem angle analysis
+    const topicsText = data.trends.map((t,i) =>
+      `${i+1}. ${t.topic}${t.tweet_count ? ` (${t.tweet_count})` : ''}`
+    ).join('\n');
+
+    const prompt = `You are a content strategist for Salem — a web3/crypto entertainer on X with 13K followers known for dramatic content bridging web3 to mainstream culture.
+
+These are LIVE trending topics on X right now:
+${topicsText}
+
+Return ONLY raw JSON, no markdown, no code blocks:
+{"trends":[{"rank":1,"topic":"exact topic from list","context":"One sentence: what this trend is about right now.","volume":"MASSIVE or HIGH or RISING","categories":["pick from: hot,web3,culture,finance,politics,sports,tech,entertainment"],"salem_angle":"One punchy sentence: how Salem covers this dramatically — connecting to web3 or mainstream culture."}]}
+
+Include all ${data.trends.length} topics. Return ONLY the JSON.`;
+
+    const aiData = await callClaude(prompt);
+    const text = aiData.content?.map(c => c.text||'').join('') || '';
+    const start = text.indexOf('{'), end = text.lastIndexOf('}');
+    if (start === -1 || end === -1) throw new Error('No JSON in AI response');
+    const parsed = JSON.parse(text.slice(start, end+1));
+    parsed._live = true;
+    parsed._source = `trends24.in/${region}`;
+    parsed._rawCount = data.count;
+    parsed._fetchedAt = data.fetched_at;
+    renderXTrends(parsed);
+
+  } catch(e) {
+    document.getElementById('x-scan-state').style.display='none';
+    showXError(e.message);
+  }
+}
+
+// ── REPLIT URL MANAGEMENT ─────────────────────────────
+function saveReplitUrl() {
+  const val = document.getElementById('replit-url-input')?.value?.trim();
+  if (val) {
+    // Update the REPLIT_URL variable at runtime
+    window._REPLIT_URL = val.replace(/\/$/, '');
+    localStorage.setItem('salem_replit_url', window._REPLIT_URL);
+  }
+}
+
+function getReplitUrl() {
+  return window._REPLIT_URL || localStorage.getItem('salem_replit_url') || REPLIT_URL;
+}
+
+async function testBackend() {
+  const url = getReplitUrl();
+  const status = document.getElementById('backend-status');
+  if (!url || url === 'YOUR_REPLIT_URL_HERE') {
+    status.textContent = '⚠ Paste your Replit URL first';
+    status.style.color = 'var(--neonTT)';
+    return;
+  }
+  status.textContent = '⏳ Testing connection...';
+  status.style.color = 'var(--dim)';
+  try {
+    const r = await fetch(`${url}/health`, { signal: AbortSignal.timeout(8000) });
+    const d = await r.json();
+    if (d.status === 'ok') {
+      status.innerHTML = '✅ Backend connected! Ready to scan live trends.';
+      status.style.color = 'var(--neon)';
+      window._REPLIT_URL = url;
+    } else {
+      throw new Error('Unexpected response');
+    }
+  } catch(e) {
+    status.textContent = `❌ Connection failed: ${e.message}. Make sure your Replit is running.`;
+    status.style.color = 'var(--neonTT)';
+  }
+}
+
+// Load saved URL on boot — handled in DOMContentLoaded above
+
+function showXError(msg) {
+  const intro = document.getElementById('x-intro');
+  intro.style.display = 'block';
+  intro.querySelector('.intro-desc').innerHTML = `
+    <span style="color:var(--neonTT);font-family:'JetBrains Mono',monospace;font-size:11px;">⚠ ${esc(msg)}</span>
+    <br><br>
+    Make sure your Render backend is running and the URL is correct.
+    <br><br>
+    <strong style="color:var(--neonX)">Steps:</strong><br>
+    <span style="font-size:13px;line-height:2;">
+    1. Go to render.com → check your Salem-s-intel service is Live<br>
+    2. Paste your URL in the box above and click Test Connection
+    </span>`;
+}
+
+function renderXTrends(data) {
+  document.getElementById('x-scan-state').style.display='none';
+  const isLive = data._live;
+  document.getElementById('x-scan-time').innerHTML = isLive
+    ? `<span style="color:var(--neon)">● LIVE</span> from ${esc(data._source||'trends24.in')} · ${data._rawCount||0} raw trends · parsed ${new Date().toLocaleTimeString()}`
+    : `Generated ${new Date().toLocaleTimeString()}`;
+
+  const grid = document.getElementById('x-trend-grid');
+  grid.innerHTML = (data.trends||[]).map((t,i) => `
+    <div class="trend-chip" style="animation-delay:${i*.05}s">
+      <div class="chip-rank">#${t.rank} · <span style="color:${t.volume==='MASSIVE'?'var(--neonTT)':t.volume==='HIGH'?'var(--neonX)':'var(--neon)'}">${t.volume}</span></div>
+      <div class="chip-topic">${esc(t.topic)}</div>
+      <div class="chip-context">${esc(t.context)}</div>
+      <div class="chip-tags">${(t.categories||[]).map(c=>`<span class="chip-tag ${c}">${c.toUpperCase()}</span>`).join('')}</div>
+      <div style="font-size:12px;color:rgba(212,224,245,.5);line-height:1.5;margin-bottom:10px;font-style:italic;">"${esc(t.salem_angle)}"</div>
+      <div class="chip-actions">
+        <button class="chip-btn" onclick="trendBridge('${esc(t.topic)}','${esc(t.context)}','${esc(t.salem_angle)}')">🔗 DEEP BRIDGE</button>
+        <button class="chip-btn" onclick="trendToScript('${esc(t.topic)}','${esc(t.context)}','${esc(t.salem_angle)}')">⚡ SCRIPT IT</button>
+      </div>
+    </div>`).join('');
+  document.getElementById('x-results').style.display='block';
+}
+
+// ── GOOGLE TRENDS SCAN ────────────────────────────────
+async function runGTScan() {
+  document.getElementById('gt-intro').style.display='none';
+  document.getElementById('gt-results').style.display='none';
+  document.getElementById('gt-scan-state').style.display='block';
+
+  const steps = [
+    'Fetching Google Trends RSS feed...',
+    'Parsing trending searches...',
+    'Running AI analysis for Salem...',
+    'Building bridge angles...'
+  ];
+  animateScanSteps('gt-scan-steps','gt-progress-bar', steps);
+
+  try {
+    // Google Trends daily trending searches RSS — no CORS issues
+    const gtUrl = 'https://trends.google.com/trends/trendingsearches/daily/rss?geo=US';
+    const proxy = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(gtUrl)}&count=15`;
+
+    const resp = await fetch(proxy);
+    const data = await resp.json();
+    if (data.status !== 'ok' || !data.items?.length) throw new Error('Could not fetch Google Trends RSS');
+
+    const topics = data.items.map(item => ({
+      title: item.title || '',
+      traffic: item['ht:approx_traffic'] || item.description?.match(/[\d,]+/)?.[0] || '',
+      pubDate: item.pubDate || ''
+    })).filter(t => t.title);
+
+    if (!topics.length) throw new Error('No trends found in feed');
+
+    const topicsText = topics.slice(0, 12).map((t, i) =>
+      `${i+1}. ${t.title}${t.traffic ? ` (~${t.traffic} searches)` : ''}`
+    ).join('\n');
+
+    const prompt = `You are a content strategist for Salem — a web3/crypto entertainer on X with 13K followers who bridges web3 to mainstream culture dramatically.
+
+These are LIVE trending Google searches right now:
+${topicsText}
+
+For each topic, return JSON analysis. Return ONLY raw JSON, no markdown:
+{"trends":[{"rank":1,"topic":"exact topic name","context":"One sentence: what this is about and why people are searching it.","volume":"MASSIVE or HIGH or RISING","categories":["pick from: hot,web3,culture,finance,politics,sports,tech,entertainment"],"salem_angle":"One punchy sentence: dramatic angle Salem should take — connecting to web3 or mainstream culture."}]}
+
+Include all topics listed. Return ONLY the JSON.`;
+
+    const aiData = await callClaude(prompt);
+    const text = aiData.content?.map(c => c.text||'').join('') || '';
+    const start = text.indexOf('{'), end = text.lastIndexOf('}');
+    if (start === -1 || end === -1) throw new Error('No JSON in AI response');
+    const parsed = JSON.parse(text.slice(start, end+1));
+    parsed._live = true;
+    parsed._source = 'Google Trends (US)';
+    renderGTTrends(parsed);
+
+  } catch(e) {
+    document.getElementById('gt-scan-state').style.display='none';
+    document.getElementById('gt-intro').style.display='block';
+    document.getElementById('gt-intro').querySelector('.intro-desc').innerHTML =
+      `<span style="color:var(--neonTT);font-family:'JetBrains Mono',monospace;font-size:11px;">⚠ ${esc(e.message)}</span><br><br>Try refreshing or check your connection.`;
+  }
+}
+
+function renderGTTrends(data) {
+  document.getElementById('gt-scan-state').style.display='none';
+  document.getElementById('gt-scan-time').innerHTML =
+    `<span style="color:var(--neon4)">● LIVE</span> from ${esc(data._source||'Google Trends')} · parsed ${new Date().toLocaleTimeString()}`;
+  const grid = document.getElementById('gt-trend-grid');
+  grid.innerHTML = (data.trends||[]).map((t,i) => `
+    <div class="trend-chip" style="border-color:rgba(61,158,255,.15);animation-delay:${i*.05}s">
+      <div class="chip-rank">#${t.rank} · <span style="color:var(--neon4)">${t.volume}</span></div>
+      <div class="chip-topic">${esc(t.topic)}</div>
+      <div class="chip-context">${esc(t.context)}</div>
+      <div class="chip-tags">${(t.categories||[]).map(c=>`<span class="chip-tag culture" style="background:rgba(61,158,255,.1);color:var(--neon4);border-color:rgba(61,158,255,.2)">${c.toUpperCase()}</span>`).join('')}</div>
+      <div style="font-size:12px;color:rgba(212,224,245,.5);line-height:1.5;margin-bottom:10px;font-style:italic;">"${esc(t.salem_angle)}"</div>
+      <div class="chip-actions">
+        <button class="chip-btn" onclick="trendBridge('${esc(t.topic)}','${esc(t.context)}','${esc(t.salem_angle)}')">🔗 DEEP BRIDGE</button>
+        <button class="chip-btn" onclick="trendToScript('${esc(t.topic)}','${esc(t.context)}','${esc(t.salem_angle)}')">⚡ SCRIPT IT</button>
+      </div>
+    </div>`).join('');
+  document.getElementById('gt-results').style.display='block';
+}
+
+// ── TIKTOK TREND SCAN ─────────────────────────────────
+async function runTTScan() {
+  document.getElementById('tt-intro').style.display='none';
+  document.getElementById('tt-results').style.display='none';
+  document.getElementById('tt-scan-state').style.display='block';
+
+  const steps = [
+    'Scanning TikTok For You page signals...',
+    'Detecting viral formats & sounds...',
+    'Analyzing mainstream culture moments...',
+    'Finding web3 content opportunities...',
+    'Building bridge angles for Salem...'
+  ];
+  await animateScanSteps('tt-scan-steps','tt-progress-bar', steps);
+
+  const prompt = `You are a TikTok trend analyst for Salem, a web3/crypto creator who bridges web3 to mainstream culture in short-form videos.
+
+Date: ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}
+
+Return ONLY a raw JSON object (no markdown, no code blocks, no extra text) with exactly 6 TikTok trends from early 2026. Keep each field SHORT — under 20 words each.
+
+{"trends":[{"rank":1,"topic":"Short trend name","context":"One short sentence about what is trending.","volume":"VIRAL","categories":["culture"],"format_tip":"Short format tip e.g. POV video","salem_angle":"One punchy sentence bridging this to web3."},{"rank":2,"topic":"Short trend name","context":"One short sentence about what is trending.","volume":"HOT","categories":["entertainment"],"format_tip":"Short format tip","salem_angle":"One punchy sentence bridging this to web3."},{"rank":3,"topic":"Short trend name","context":"One short sentence about what is trending.","volume":"RISING","categories":["finance"],"format_tip":"Short format tip","salem_angle":"One punchy sentence bridging this to web3."},{"rank":4,"topic":"Short trend name","context":"One short sentence about what is trending.","volume":"HOT","categories":["music"],"format_tip":"Short format tip","salem_angle":"One punchy sentence bridging this to web3."},{"rank":5,"topic":"Short trend name","context":"One short sentence about what is trending.","volume":"VIRAL","categories":["lifestyle"],"format_tip":"Short format tip","salem_angle":"One punchy sentence bridging this to web3."},{"rank":6,"topic":"Short trend name","context":"One short sentence about what is trending.","volume":"RISING","categories":["tech"],"format_tip":"Short format tip","salem_angle":"One punchy sentence bridging this to web3."}]}
+
+Fill in real, specific TikTok trends for early 2026. Return ONLY the JSON object above with real content substituted in. Nothing else.`;
+
+  try {
+    const data = await callClaude(prompt);
+    const text = data.content?.map(c=>c.text||'').join('') || '';
+    const start = text.indexOf('{'), end = text.lastIndexOf('}');
+    if (start === -1 || end === -1) throw new Error('No JSON found in response');
+    const parsed = JSON.parse(text.slice(start, end+1));
+    renderTTTrends(parsed);
+  } catch(e) {
+    document.getElementById('tt-scan-state').style.display='none';
+    document.getElementById('tt-intro').style.display='block';
+    document.getElementById('tt-intro').querySelector('.intro-desc').textContent = 'Scan failed — please try again. ('+e.message+')';
+  }
+}
+
+function renderTTTrends(data) {
+  document.getElementById('tt-scan-state').style.display='none';
+  document.getElementById('tt-scan-time').textContent = 'Scanned ' + new Date().toLocaleTimeString();
+  const grid = document.getElementById('tt-trend-grid');
+  grid.innerHTML = data.trends.map((t,i) => `
+    <div class="trend-chip tt-chip" style="animation-delay:${i*.06}s">
+      <div class="chip-rank">#${t.rank} · ${t.volume}</div>
+      <div class="chip-topic">${esc(t.topic)}</div>
+      <div class="chip-context">${esc(t.context)}</div>
+      <div class="chip-tags">${(t.categories||[]).map(c=>`<span class="chip-tag culture">${c.toUpperCase()}</span>`).join('')}</div>
+      <div style="font-size:11px;color:rgba(255,79,109,.7);font-family:'JetBrains Mono',monospace;letter-spacing:.08em;margin-bottom:6px;">FORMAT: ${esc(t.format_tip||'')}</div>
+      <div style="font-size:12px;color:rgba(212,224,245,.5);line-height:1.5;margin-bottom:10px;font-style:italic;">"${esc(t.salem_angle)}"</div>
+      <div class="chip-actions">
+        <button class="chip-btn" onclick="trendBridge('${esc(t.topic)}','${esc(t.context)}','${esc(t.salem_angle)}')">🔗 DEEP BRIDGE</button>
+        <button class="chip-btn" onclick="trendToScript('${esc(t.topic)}','${esc(t.context)}','${esc(t.salem_angle)}')">⚡ SCRIPT IT</button>
+      </div>
+    </div>`).join('');
+  document.getElementById('tt-results').style.display='block';
+}
+
+// ── BRIDGE ────────────────────────────────────────────
+async function trendBridge(topic, context, angle) {
+  activeTrend = { topic, context, salemAngle: angle };
+  const panel = document.getElementById('bridge-panel');
+  const content = document.getElementById('bridge-content');
+  const actions = document.getElementById('bridge-actions');
+  document.getElementById('bridge-topic').textContent = topic;
+  content.innerHTML = `<div class="ai-loading"><div class="dots"><span></span><span></span><span></span></div> GENERATING DEEP BRIDGE ANALYSIS...</div>`;
+  actions.style.display='none';
+  panel.classList.add('visible');
+  panel.scrollIntoView({behavior:'smooth',block:'start'});
+
+  const prompt = `You are a content strategist for Salem — a web3/crypto entertainer with 13K followers known for dramatic content that bridges web3 to mainstream culture.
+
+Trending topic: "${topic}"
+Context: "${context}"
+Initial angle: "${angle}"
+
+Give Salem a DEEP BRIDGE ANALYSIS in 4-5 sentences:
+1. The emotional core of why this is trending (what people actually feel about it)
+2. The specific web3/crypto parallel — name actual projects, tokens, or events
+3. The dramatic narrative arc for a video (beginning, tension, reveal)
+4. One killer opening line for a video that would stop someone from scrolling
+5. The best platform to post this on first and why
+
+Be specific, punchy, and dramatic. Write directly to Salem.`;
+
+  try {
+    const data = await callClaude(prompt);
+    const text = data.content?.map(c=>c.text||'').join('')||'';
+    content.innerHTML = `<div class="bridge-text">${esc(text).replace(/\n/g,'<br>')}</div>`;
+    actions.style.display='flex';
+    activeTrend._analysis = text;
+  } catch(e) {
+    content.innerHTML = `<div style="color:var(--dim);font-size:11px;font-family:JetBrains Mono,monospace;">ANALYSIS UNAVAILABLE</div>`;
+  }
+}
+
+function closeBridge() { document.getElementById('bridge-panel').classList.remove('visible'); }
+
+async function quickBridgeNews(id) {
+  const a = allArticles.find(x=>x.id===id);
+  if(!a) return;
+  activeStory = a;
+  activeTrend = { topic: a.title, context: a.summary, salemAngle: '' };
+  await trendBridge(a.title, a.summary, '');
+}
+
+function trendToScript(topic, context, angle) {
+  activeTrend = { topic, context, salemAngle: angle };
+  openScriptGen();
+}
+
+function openScriptGen() {
+  const t = activeTrend || activeStory;
+  if (!t) return;
+  const brief = `TREND/STORY: ${t.topic||t.title}\n\nCONTEXT: ${t.context||t.summary||''}\n\nSALEM ANGLE: ${t.salemAngle||t._analysis||''}`;
+  localStorage.setItem('salem_story_brief', brief);
+  alert('✅ Story brief saved!\n\nOpen your Salem Script Generator and paste it in.\n\n' + (t.topic||t.title));
+}
+
+// ── NEWS MODAL ────────────────────────────────────────
+function openNewsModal(id) {
+  const a = allArticles.find(x=>x.id===id);
+  if(!a) return;
+  activeStory = a;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-tag"><span class="tag ${a.tag}">${a.tag.toUpperCase()}</span></div>
+    <div class="modal-title">${esc(a.title)}</div>
+    <div class="modal-meta"><span class="modal-meta-item">${a.source}</span><span class="modal-meta-item">${ago(a.pubDate)}</span></div>
+    <div class="modal-summary">${esc(a.summary)}...</div>
+    <div class="modal-divider"></div>
+    <div class="modal-bridge-lbl">// BRIDGE ANALYSIS</div>
+    <div id="modal-bridge"><div class="ai-loading"><div class="dots"><span></span><span></span><span></span></div> ANALYZING...</div></div>
+    <div class="modal-actions">
+      <button class="modal-btn primary" id="modal-script-btn" style="display:none" onclick="openScriptGen();closeModal();">⚡ SCRIPT IT</button>
+      <button class="modal-btn" onclick="window.open('${a.url}','_blank')">↗ READ</button>
+      <button class="modal-btn ml" onclick="closeModal()">✕</button>
+    </div>`;
+  document.getElementById('modal-overlay').classList.add('visible');
+  getNewsbridge(a);
+}
+
+async function getNewsbridge(a) {
+  const prompt = `Content strategist for Salem — web3 creator, 13K followers, dramatic entertainment style bridging web3 + mainstream.
+
+Article: "${a.title}"
+Summary: "${a.summary}"
+Type: ${a.type==='web2'?'Web2/Tech':'Web3/Crypto'}
+
+In 3-4 sentences: (1) unexpected connection to ${a.type==='web2'?'web3':'mainstream culture'}, (2) dramatic angle to take, (3) one punchy hook line to open a video. Direct advice to Salem.`;
+  try {
+    const data = await callClaude(prompt);
+    if(el) el.innerHTML = `<div class="modal-bridge-body">${esc(text).replace(/\n/g,'<br>')}</div>`;
+    const btn = document.getElementById('modal-script-btn');
+    if(btn) { btn.style.display='inline-block'; a._analysis=text; activeTrend={topic:a.title,context:a.summary,salemAngle:text}; }
+  } catch(e) {}
+}
+
+function closeModal(e) {
+  if(!e||e.target===document.getElementById('modal-overlay'))
+    document.getElementById('modal-overlay').classList.remove('visible');
+}
+
+// ── UTILS ─────────────────────────────────────────────
+async function callClaude(prompt) {
+  const body = {
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 2000,
+    messages: [{ role: 'user', content: prompt }]
+  };
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.error?.message||'API error');
+  return d;
+}
+
+async function animateScanSteps(stepsId, barId, steps) {
+  const stepsEl = document.getElementById(stepsId);
+  const barEl = document.getElementById(barId);
+  stepsEl.innerHTML = steps.map(s=>`<div class="scan-step"><span class="step-icon">○</span>${s}</div>`).join('');
+  const els = stepsEl.querySelectorAll('.scan-step');
+  for(let i=0;i<els.length;i++) {
+    if(i>0) els[i-1].classList.remove('active');
+    if(i>0) { els[i-1].classList.add('done'); els[i-1].querySelector('.step-icon').textContent='✓'; }
+    els[i].classList.add('active'); els[i].querySelector('.step-icon').textContent='▶';
+    barEl.style.width = ((i+1)/steps.length*100)+'%';
+    await sleep(700);
+  }
+  els[els.length-1].classList.remove('active'); els[els.length-1].classList.add('done');
+  els[els.length-1].querySelector('.step-icon').textContent='✓';
+  barEl.style.width='100%';
+  await sleep(300);
+}
+
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function strip(h){ const d=document.createElement('div');d.innerHTML=h;return d.textContent||''; }
+function ago(ds){
+  const m=Math.floor((Date.now()-new Date(ds))/60000);
+  if(m<1) return 'just now'; if(m<60) return m+'m ago';
+  if(m<1440) return Math.floor(m/60)+'h ago'; return Math.floor(m/1440)+'d ago';
+}
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+</script>
+</body>
+</html>
